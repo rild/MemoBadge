@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="colorScheme_BrightPastel_Blue_0">#F3FAFE</color>
+    <color name="colorScheme_BrightPastel_Blue_1">#99D5F5</color>
+    <color name="colorScheme_BrightPastel_Blue_2">#5BBDF2</color>
+    <color name="colorScheme_BrightPastel_Blue_3">#23A9F1</color>
+    <color name="colorScheme_BrightPastel_Blue_4">#029CEF</color>
+    <color name="colorScheme_BrightPastel_Yellow_0">#FFFCF3</color>
+    <color name="colorScheme_BrightPastel_Yellow_1">#FFE29A</color>
+    <color name="colorScheme_BrightPastel_Yellow_2">#FFD058</color>
+    <color name="colorScheme_BrightPastel_Yellow_3">#FFBE19</color>
+    <color name="colorScheme_BrightPastel_Yellow_4">#FFB700</color>
+    <color name="colorScheme_BrightPastel_Red_0">#FFF6F3</color>
+    <color name="colorScheme_BrightPastel_Red_1">#FFB49A</color>
+    <color name="colorScheme_BrightPastel_Red_2">#FF8358</color>
+    <color name="colorScheme_BrightPastel_Red_3">#FF5419</color>
+    <color name="colorScheme_BrightPastel_Red_4">#FF4100</color>
+</resources>
