@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <corners android:radius="5dp" />
+
+    <solid android:color="@color/colorScheme_BrightPastel_Blue_1" />
+    <gradient
+        android:angle="90"
+        android:endColor="@color/colorScheme_BrightPastel_Blue_0"
+        android:startColor="@color/colorScheme_BrightPastel_Blue_1" />
+
+</shape>

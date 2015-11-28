@@ -13,13 +13,6 @@
         android:layout_alignParentTop="true"
         android:background="@color/colorScheme_BrightPastel_Yellow_0">
 
-        <TextView android:text="badge place" android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView"
-            android:layout_marginBottom="47dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true" />
-
         <ImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -32,7 +25,7 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="96dp"
+            android:layout_height="72dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
@@ -48,21 +41,31 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:padding="16dp" />
+                android:layout_marginLeft="16dp" />
 
             <Switch
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="48dp"
-                android:text="Make Badge"
                 android:id="@+id/switch1"
                 android:layout_alignTop="@+id/button"
                 android:layout_toRightOf="@+id/button"
                 android:layout_toEndOf="@+id/button"
-                android:padding="16dp"
                 android:background="@color/colorScheme_BrightPastel_Blue_2"
-                android:checked="false" />
+                android:checked="false"
+                android:thumb="@drawable/mk_bdg_switch"
+                android:track="@drawable/abc_switch_track_mtrl_alpha"
+                android:layout_marginRight="16dp"
+                android:text="make badge"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp" />
         </LinearLayout>
 
     </RelativeLayout>
+
+    <TextView android:text="badge place" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

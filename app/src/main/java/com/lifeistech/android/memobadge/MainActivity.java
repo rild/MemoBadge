@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.os.Build;
+import android.preference.PreferenceManager;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,13 +27,14 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener{
+public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
 
     Button button;
     Switch aSwitch;
     ImageView imageView;
-    RelativeLayout layout;
+    RelativeLayout container;
     List<BadgeInfo> badgeInfos;
+    List<Integer> viewIds;
     int count = 0;
 
     private final int BADGEVIEW_ID = 10000;
@@ -42,35 +45,71 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         setContentView(R.layout.activity_main);
 
         badgeInfos = new ArrayList<BadgeInfo>();
+        viewIds = new ArrayList<Integer>();
 
-        layout = (RelativeLayout) findViewById(R.id.container);
+        container = (RelativeLayout) findViewById(R.id.container);
         aSwitch = (Switch) findViewById(R.id.switch1);
         button = (Button) findViewById(R.id.button);
         imageView = (ImageView) findViewById(R.id.imageView);
 
         load();
         aSwitch.setOnCheckedChangeListener(this);
+        aSwitch.setTextOn("      ");
+        aSwitch.setTextOff("      ");
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 makeBadge(v);
+//                touchEventTest(v); //touch event test
+            }
+        });
+        button.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.v("event:", "onClick");
+                BadgeDialogFragment dialog = new BadgeDialogFragment();
+                dialog.show(getSupportFragmentManager(), "dialog");
+                return false;
             }
         });
     }
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(isChecked == true){
+        if (isChecked/* == true*/) {
             int color = getApplicationContext().getResources().getColor(R.color.colorScheme_BrightPastel_Red_2);
             button.setBackgroundColor(color);
             color = getApplicationContext().getResources().getColor(R.color.colorScheme_BrightPastel_Yellow_2);
             imageView.setBackgroundColor(color);
+
+            for (int i = 0; i < count; i++) {
+                int viewId = viewIds.get(i);
+                BadgeView badgeView = (BadgeView) findViewById(viewId);
+                Log.v("viewId:", String.valueOf(viewId));
+                if (badgeView != null) {
+                    Log.v("badgeFlag:", "toBeTrue");
+                    badgeView.setSwitchisCheched(true);
+                }
+            }
+
             aSwitch.setChecked(true);
-        }else{
-            aSwitch.setChecked(false);
+        } else {
             int color = getApplicationContext().getResources().getColor(R.color.colorScheme_BrightPastel_Blue_2);
             button.setBackgroundColor(color);
             color = getApplicationContext().getResources().getColor(R.color.colorScheme_BrightPastel_Yellow_0);
             imageView.setBackgroundColor(color);
+
+            for (int i = 0; i < count; i++) {
+                int viewId = viewIds.get(i);
+                BadgeView badgeView = (BadgeView) findViewById(viewId);
+                Log.v("viewId:", String.valueOf(viewId));
+                if (badgeView != null) {
+                    Log.v("badgeFlag:", "toBeFalse");
+                    badgeView.setSwitchisCheched(false);
+                }
+            }
+
+            aSwitch.setChecked(false);
         }
     }
 
@@ -95,68 +134,119 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public void makeBadge(View v) {
 
         if (aSwitch.isChecked()) {
-            BadgeView badge = new BadgeView(this);
-            int viewId = count + BADGEVIEW_ID;
+            final BadgeView badge = new BadgeView(this);
+            badge.setClickable(true);
+            Log.v("count:", String.valueOf(count));
+//            int viewId = count + BADGEVIEW_ID;
+            int viewId = badge.generateViewId();
+            viewIds.add(viewId);
+
+            Log.v("viewIdt:", String.valueOf(viewId));
             badge.setId(viewId);
-            DragViewListener listener2 = new DragViewListener(badge);
-//            badge2.setOnTouchListener(listener2);
-            badge.setWidth(96);
-            badge.setHeight(96);
-//            badge.setBackgroundResource(R.drawable.circle_button);
 
-            layout.addView(badge);
-            count++;
-            Toast.makeText(this, "made a badge", Toast.LENGTH_SHORT).show();
+            badge.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    badge.bringToFront();
 
-        }else {
-//            Button badge = new Button(this);
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            Log.d("touchEvent:", "Touch ACTION_DOWN");
+                            int viewId = badge.getId();
+                            Log.d("viewId:", String.valueOf(viewId));
+                            badge.offsetX = (int) event.getX();
+                            badge.offsetY = (int) event.getY();
+//                callOnClick();
+
+//                Log.v("viewId:", String.valueOf(viewId));
+//                BadgeView badgeView = (BadgeView) findViewById(viewId);
 //
-//            DragViewListener listener = new DragViewListener(badge);
-//            badge.setOnTouchListener(new View.OnTouchListener() {
-//                @Override
-//                public boolean onTouch(View v, MotionEvent event) {
-//                    ClipData data = ClipData.newPlainText("", "");
-//                    v.startDrag(data, new View.DragShadowBuilder(v), v, 0);
+//                if (badgeView != null) {
+//                    RelativeLayout layout = (RelativeLayout) badgeView.getParent();
+//                    layout.removeView(badgeView);
+//                }
+                            break;
+                        case MotionEvent.ACTION_UP:
+//                performClick();
+                            Log.d("touchEvent:", "Touch ACTION_UP");
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            Log.d("touchEvent:", "Touch ACTION_MOVE");
+                            badge.x = (int) event.getRawX() - badge.offsetX - badge.mWidth / 2;
+
+                            Rect rect = new Rect();
+                            badge.getWindowVisibleDisplayFrame(rect);
+                            int statusBarHeight = rect.top; // ステータスバーの高さ
+                            badge.y = (int) event.getRawY() - (badge.offsetY + statusBarHeight) - badge.mHeight / 2;
+                            badge.setX(badge.x);
+                            badge.setY(badge.y);
+                            break;
+                    }
+//        if (!switchState/* == false*/) return false;
+//                    return true;
 //                    return false;
-//                }
-//            });
-//            //badge.setOnTouchListener(listener);
-//            badge.setOnDragListener(new View.OnDragListener() {
+                    return !aSwitch.isChecked();
+                }
+            });
+
+            badge.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Log.v("touchEvent:", "onLongClick");
+                    return false;
+                }
+            });
+            badge.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.v("touchEvent:", "onClick");
+                    BadgeDialogFragment dialog = new BadgeDialogFragment();
+                    dialog.show(getSupportFragmentManager(), "dialog");
+                }
+            });
+
+//            badge.setOnClickListener(new View.OnClickListener() {
 //                @Override
-//                public boolean onDrag(View v, DragEvent event) {
-//                    boolean result = false;
-//                    final int action = event.getAction();
-//                    Log.d("", String.valueOf(action));
-//                    switch (action) {
-//                        case DragEvent.ACTION_DRAG_STARTED:
-//                        case DragEvent.ACTION_DRAG_LOCATION:
-//                            result = true;
-//                            break;
-//                        case DragEvent.ACTION_DRAG_ENDED:
-//                            v.setLeft((int) event.getX());
-//                            v.setX(event.getX());
-//                            v.setY(event.getY());
-//                            v.layout((int) event.getX(), (int) event.getY(), (int) event.getX() + v.getWidth(), (int) event.getY()
-//                                    + v.getHeight());
-//                            result = true;
-//                            break;
-//                        default:
-//                            result = false;
-//                            break;
-//
-//
-//                    }
-//                    return result;
+//                public void onClick(View v) {
+//                    Log.v("event:", "onClick");
+//                    BadgeDialogFragment dialog = new BadgeDialogFragment();
+//                    dialog.show(getSupportFragmentManager(),"dialog");
 //                }
 //            });
+//            DragViewListener listener2 = new DragViewListener(badge);
+//            badge2.setOnTouchListener(listener2);
 //            badge.setWidth(96);
 //            badge.setHeight(96);
-////            badge.setBackgroundResource(R.drawable.circle_button);
-//
-//            layout.addView(badge);
-//            count++;
-//
-//            Toast.makeText(this, "made a badge", Toast.LENGTH_SHORT).show();
+//            badge.setBackgroundResource(R.drawable.circle_button);
+
+            container.addView(badge);
+            count++;
+            Log.v("count:", String.valueOf(count));
+            Toast.makeText(this, "made a badge", Toast.LENGTH_SHORT).show();
+
+        } else {
+            Log.d("delete:", "prefdata");
+
+            for (int i = 0; i < count; i++) {
+                int viewId = viewIds.get(i);
+//                BadgeView badgeView = (BadgeView) findViewById(i + BADGEVIEW_ID);
+                BadgeView badgeView = (BadgeView) findViewById(viewId);
+                Log.v("viewId:", String.valueOf(viewId));
+                if (badgeView != null) {
+                    container.removeView(badgeView);
+                }
+
+                SharedPreferences data = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = data.edit();
+                editor.remove("text" + KEY_INPUT_DATA + i).commit();
+                editor.remove("locationX" + KEY_SELECT_POS + i).commit();
+                editor.remove("locationY" + KEY_SELECT_POS + i).commit();
+                editor.remove("badge_cnt" + KEY_INPUT_DATA + i).commit();
+            }
+
+            Log.v("count:", String.valueOf(count));
+            count = 0;
+            Log.v("count:", String.valueOf(count));
         }
     }
 
@@ -173,26 +263,32 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
 
+        Log.v("count:", String.valueOf(count));
         editor.putInt("badge_cnt" + KEY_INPUT_DATA, count);
+        Log.v("count:", String.valueOf(count) + " isSaved");
         for (int i = 0; i < count; i++) {
-            BadgeView badgeView = (BadgeView) findViewById(i + BADGEVIEW_ID);
-            String str_text = badgeView.getText()
-                    .toString();
-            editor.putString("text" + KEY_INPUT_DATA + i, str_text);
-            int[] location = new int[2];
-            badgeView.getLocationInWindow(location);
-            Window window = getWindow();
+            int viewId = viewIds.get(i);
+//            BadgeView badgeView = (BadgeView) findViewById(i + BADGEVIEW_ID);
+            BadgeView badgeView = (BadgeView) findViewById(viewId);
+            if (badgeView != null) {
+                String str_text = badgeView.getText()
+                        .toString();
+                editor.putString("text" + KEY_INPUT_DATA + i, str_text);
+                int[] location = new int[2];
+                badgeView.getLocationInWindow(location);
+                Window window = getWindow();
 
-            Rect rect = new Rect();
-            window.getDecorView().getWindowVisibleDisplayFrame(rect);
-            int statusBarHeight = rect.top; // ステータスバーの高さ
+                Rect rect = new Rect();
+                window.getDecorView().getWindowVisibleDisplayFrame(rect);
+                int statusBarHeight = rect.top; // ステータスバーの高さ
 
-            editor.putInt("locationX" + KEY_SELECT_POS + i,
-                    location[0]);
-            editor.putInt("locationY" + KEY_SELECT_POS + i,
-                    location[1] /*- statusBarHeight*/);
-            editor.apply();
+                editor.putInt("locationX" + KEY_SELECT_POS + i,
+                        location[0]);
+                editor.putInt("locationY" + KEY_SELECT_POS + i,
+                        location[1] /*- statusBarHeight*/);
+            }
         }
+        editor.apply();
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -203,17 +299,82 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         SharedPreferences data = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
 
         count = data.getInt("badge_cnt" + KEY_INPUT_DATA, 0);
-        for (int i = 0; i < count; i++) {
-            String str_text = data.getString("text" + KEY_INPUT_DATA + i, "");
-            BadgeView badgeView = new BadgeView(this);
-            badgeView.setText(str_text);
-            int[] location = new int[2];
-            location[0] = data.getInt("locationX" + KEY_SELECT_POS + i, 72);
-            location[1] = data.getInt("locationY" + KEY_SELECT_POS + i, 72);
-            badgeView.setX(location[0]);
-            badgeView.setY(location[1]);
-            layout = (RelativeLayout) findViewById(R.id.container);
-            layout.addView(badgeView);
+        Log.v("count:", String.valueOf(count));
+
+        if (count != 0) {
+            for (int i = 0; i < count; i++) {
+                String str_text = data.getString("text" + KEY_INPUT_DATA + i, "");
+                BadgeView badgeView = new BadgeView(this);
+//                int viewId = i + BADGEVIEW_ID;
+
+                int viewId = badgeView.generateViewId();
+                viewIds.add(viewId);
+
+
+//                BadgeView badgeView = (BadgeView) findViewById(i + BADGEVIEW_ID);
+//                badgeView = (BadgeView) findViewById(viewId);
+
+                Log.v("viewIdt:", String.valueOf(viewId));
+                badgeView.setId(viewId);
+                badgeView.setText(str_text);
+                int[] location = new int[2];
+                Rect rect = new Rect();
+                Window window = getWindow();
+                if (window == null) Log.v("window:", "isNull");
+                window.getDecorView().getWindowVisibleDisplayFrame(rect);
+                int statusBarHeight = rect.top;
+                Log.v("statusBarHeight:", String.valueOf(statusBarHeight));
+                location[0] = data.getInt("locationX" + KEY_SELECT_POS + i, 72);
+                location[1] = data.getInt("locationY" + KEY_SELECT_POS + i, 72) - statusBarHeight;
+                badgeView.setX(location[0]);
+                badgeView.setY(location[1]);
+                container = (RelativeLayout) findViewById(R.id.container);
+                container.addView(badgeView);
+            }
+        }
+        Log.v("count:", String.valueOf(count) + "@loadEnd");
+    }
+
+    public void touchEventTest(View v) {
+//        Button btn = (Button)this.findViewById(R.id.myButton);
+        if (v instanceof Button) {
+            Button btn = (Button) v;
+            // タッチイベント
+            // ボタンを押すとACTION_DOWN、離すとACTION_UPが発生
+            btn.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    int action = event.getAction();
+                    switch (action) {
+                        case MotionEvent.ACTION_DOWN:
+                            Log.v("touchEvent:", "onTouch ACTION_DOWN");
+                            break;// 押す
+                        case MotionEvent.ACTION_UP:
+                            Log.v("touchEvent:", "onTouch ACTION_UP");
+                            break;// 離す
+                        case MotionEvent.ACTION_MOVE:
+                            Log.v("touchEvent:", "onTouch ACTION_MOVE");
+                            break;//動かす
+                    }
+
+                    // trueにすると以下のOnLongClickやOnClickが呼ばれない
+                    return true;
+                }
+            });
+
+            // 長押しイベント
+            btn.setOnLongClickListener(new View.OnLongClickListener() {
+                public boolean onLongClick(View v) {
+                    // trueにすると以下のOnClickが呼ばれない
+                    Log.v("touchEvent:", "onLongClick");
+                    return false;
+                }
+            });
+            // クリックイベント
+            btn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Log.v("touchEvent:", "onClick");
+                }
+            });
         }
     }
 }

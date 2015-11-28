@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.jar.Attributes;
@@ -25,7 +26,7 @@ import java.util.jar.Attributes;
 /**
  * Created by rild on 15/10/23.
  */
-public class BadgeView extends Button {
+public class BadgeView extends Button /*implements View.OnClickListener*/ {
     float x, y;
     private final Paint mHighlightPaint;
     private float mShadowRadius, mShadowDx, mShadowDy;
@@ -34,6 +35,7 @@ public class BadgeView extends Button {
     int mWidth;
     int mHeight;
     int mRadius;
+    boolean switchState;
     private Bitmap image;
 
     String mText;
@@ -55,6 +57,7 @@ public class BadgeView extends Button {
         super(context, attrs, defStyleAttr);
         mHighlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+        switchState = true;
         mWidth = 144;
         mHeight = mWidth;
         x = mWidth / 2;
@@ -94,40 +97,67 @@ public class BadgeView extends Button {
 //        }
 //    }
 
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
 
-        bringToFront();
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                Log.d("Event", "Touch action down");
-                offsetX = (int) event.getX();
-                offsetY = (int) event.getY();
-                mState = STATE_DRAG;
-                break;
-            case MotionEvent.ACTION_UP:
-                Log.d("Event", "Touch action up");
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                mState = STATE_NONE;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (mState == STATE_DRAG) {
-                    x = (int) event.getRawX() - offsetX - mWidth / 2;
-
-                    Rect rect = new Rect();
-                    getWindowVisibleDisplayFrame(rect);
-                    int statusBarHeight = rect.top; // ステータスバーの高さ
-                    y = (int) event.getRawY() - (offsetY + statusBarHeight) - mHeight / 2;
-                    setX(x);
-                    setY(y);
-                }
-                break;
-        }
+//        bringToFront();
+//
+//        switch (event.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                Log.d("touchEvent:", "Touch ACTION_DOWN");
+//                int viewId = getId();
+//                Log.d("viewId:", String.valueOf(viewId));
+//                offsetX = (int) event.getX();
+//                offsetY = (int) event.getY();
+////                callOnClick();
+//                mState = STATE_DRAG;
+//
+////                Log.v("viewId:", String.valueOf(viewId));
+////                BadgeView badgeView = (BadgeView) findViewById(viewId);
+////
+////                if (badgeView != null) {
+////                    RelativeLayout layout = (RelativeLayout) badgeView.getParent();
+////                    layout.removeView(badgeView);
+////                }
+//                break;
+//            case MotionEvent.ACTION_UP:
+////                performClick();
+//                Log.d("touchEvent:", "Touch ACTION_UP");
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                Log.d("touchEvent:", "Touch ACTION_MOVE");
+//                if (mState == STATE_DRAG) {
+//                    x = (int) event.getRawX() - offsetX - mWidth / 2;
+//
+//                    Rect rect = new Rect();
+//                    getWindowVisibleDisplayFrame(rect);
+//                    int statusBarHeight = rect.top; // ステータスバーの高さ
+//                    y = (int) event.getRawY() - (offsetY + statusBarHeight) - mHeight / 2;
+//                    setX(x);
+//                    setY(y);
+//                }
+//                break;
+//        }
+////        if (!switchState/* == false*/) return false;
         return true;
+        /*
+        11/29 falseにすると TouchACTION_DOWN => onLongClick
+            tureにすると TouchACTION_DOWN => (TouchACTION_MOVE =>) onLongClick => (TouchACTION_MOVE =>) TouchACTION_UP => onClick
+         */
     }
+
+//    @Override
+//    public boolean performClick() {
+//        super.performClick();
+//        return true;
+//    }
+
+//    @Override
+//    public void onClick(View v) {
+//
+//    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -145,5 +175,9 @@ public class BadgeView extends Button {
     public void whereBadge() {
         Log.d("X:", String.valueOf(x));
         Log.d("Y:", String.valueOf(y));
+    }
+
+    public void setSwitchisCheched(boolean state) {
+        this.switchState = state;
     }
 }
