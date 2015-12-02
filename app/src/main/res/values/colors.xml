@@ -19,4 +19,7 @@
     <color name="colorScheme_BrightPastel_Red_2">#FF8358</color>
     <color name="colorScheme_BrightPastel_Red_3">#FF5419</color>
     <color name="colorScheme_BrightPastel_Red_4">#FF4100</color>
+
+    <color name="testColor1">#053859</color>
+    <color name="testColor2">#24A5F2</color>
 </resources>

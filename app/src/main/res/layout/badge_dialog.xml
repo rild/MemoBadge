@@ -19,7 +19,7 @@
 
         <!-- タイトル -->
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/dialog_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_badge_title"
@@ -30,7 +30,7 @@
 
         <!-- メッセージ -->
         <TextView
-            android:id="@+id/message"
+            android:id="@+id/dialog_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
@@ -41,34 +41,52 @@
 
         <!-- OK ボタン -->
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/dialog_editText"
             android:layout_width="match_parent"
             android:layout_height="96dp"
             android:layout_gravity="center_horizontal"
             android:background="@drawable/bg_badge_edittext"
             android:layout_margin="20dp"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="@color/colorScheme_BrightPastel_Blue_3"/>
 
-        <Button
-            android:id="@+id/positive_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/bg_badge_positive"
-            android:text="OK"
-            android:textColor="@android:color/white" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/dialog_positive_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_badge_positive"
+                android:text="OK"
+                android:textColor="@android:color/white"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
+            <Button
+                android:id="@+id/dialog_delete_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ic_trash_licensed"
+                android:textColor="@color/colorScheme_BrightPastel_Blue_3"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="16dp" />
+        </RelativeLayout>
 
     </LinearLayout>
 
     <!-- Close ボタン -->
     <Button
-        android:id="@+id/close_button"
+        android:id="@+id/dialog_close_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/bg_badge_close"
         android:text="×"
-        android:textColor="#9acd32" />
+        android:textColor="@color/colorScheme_BrightPastel_Blue_3" />
 
 </RelativeLayout>

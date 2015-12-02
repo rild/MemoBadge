@@ -1,5 +1,6 @@
 package com.lifeistech.android.memobadge;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,9 +39,11 @@ public class BadgeView extends Button /*implements View.OnClickListener*/ {
     boolean switchState;
     private Bitmap image;
 
-    String mText;
+    private String mTextData;
 
     int mState = 0;
+
+    private final int LAYOUT_MARGINE = 4;
     private final int STATE_NONE = 0;
     private final int STATE_DRAG = 1;
 
@@ -53,9 +56,14 @@ public class BadgeView extends Button /*implements View.OnClickListener*/ {
         this(context, attrs, 0);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     public BadgeView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mHighlightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mTextData = "";
+        int viewId = generateViewId();
+        setId(viewId);
+        setBackgroundResource(R.drawable.bg_badge);
 
         switchState = true;
         mWidth = 144;
@@ -63,112 +71,63 @@ public class BadgeView extends Button /*implements View.OnClickListener*/ {
         x = mWidth / 2;
         y = mWidth / 2;
         mRadius = mWidth / 2;
+        setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                bringToFront();
 
-//        setBackgroundColor(Color.argb(80, 255, 255, 255));
-//        image = BitmapFactory.decodeResource(getResources(), R.drawable.icon_memo);
-//        mWidth = image.getWidth();
-////        mHeight = (120 > image.getHeight()) ? 120 : image.getHeight();
-//        mHeight = image.getHeight();
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        Log.d("touchEvent:", "Touch ACTION_DOWN");
+                        int viewId = getId();
+                        Log.d("viewId:", String.valueOf(viewId));
+                        offsetX = (int) event.getX();
+                        offsetY = (int) event.getY();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        Log.d("touchEvent:", "Touch ACTION_UP");
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        Log.d("touchEvent:", "Touch ACTION_MOVE");
+                        x = (int) event.getRawX() - offsetX - mWidth / 2;
+
+                        Rect rect = new Rect();
+                        getWindowVisibleDisplayFrame(rect);
+                        int statusBarHeight = rect.top; // ステータスバーの高さ
+                        y = (int) event.getRawY() - (offsetY + statusBarHeight) - mHeight / 2;
+                        setX(x);
+                        setY(y);
+                        break;
+                }
+                return !switchState;
+            }
+        });
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int color = getContext().getResources().getColor(R.color.colorScheme_BrightPastel_Red_1);
-        mHighlightPaint.setColor(color);
-//        canvas.drawColor(color);
-        color = getContext().getResources().getColor(R.color.colorScheme_BrightPastel_Red_2);
-        mHighlightPaint.setColor(color);
-        canvas.drawCircle(x, y, mRadius, mHighlightPaint);
-////        canvas.drawBitmap(image, 100, 30, mHighlightPaint);
+//        int color = getContext().getResources().getColor(R.color.colorScheme_BrightPastel_Red_1);
+//        mHighlightPaint.setColor(color);
+//        color = getContext().getResources().getColor(R.color.colorScheme_BrightPastel_Red_2);
+//        mHighlightPaint.setColor(color);
+//        canvas.drawCircle(x, y, mRadius, mHighlightPaint);
         super.onDraw(canvas);
     }
-
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent event) {
-//        float touchX = event.getX(), touchY = event.getY();
-//        float r = mRadius;
-//
-//        double length = Math.hypot(touchX - x, touchY - y);
-//
-//        if (length <= r) {
-//            return super.dispatchTouchEvent(event);
-//        } else {
-//            return false;
-//        }
-//    }
 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
 
-//        bringToFront();
-//
-//        switch (event.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                Log.d("touchEvent:", "Touch ACTION_DOWN");
-//                int viewId = getId();
-//                Log.d("viewId:", String.valueOf(viewId));
-//                offsetX = (int) event.getX();
-//                offsetY = (int) event.getY();
-////                callOnClick();
-//                mState = STATE_DRAG;
-//
-////                Log.v("viewId:", String.valueOf(viewId));
-////                BadgeView badgeView = (BadgeView) findViewById(viewId);
-////
-////                if (badgeView != null) {
-////                    RelativeLayout layout = (RelativeLayout) badgeView.getParent();
-////                    layout.removeView(badgeView);
-////                }
-//                break;
-//            case MotionEvent.ACTION_UP:
-////                performClick();
-//                Log.d("touchEvent:", "Touch ACTION_UP");
-//                break;
-//            case MotionEvent.ACTION_MOVE:
-//                Log.d("touchEvent:", "Touch ACTION_MOVE");
-//                if (mState == STATE_DRAG) {
-//                    x = (int) event.getRawX() - offsetX - mWidth / 2;
-//
-//                    Rect rect = new Rect();
-//                    getWindowVisibleDisplayFrame(rect);
-//                    int statusBarHeight = rect.top; // ステータスバーの高さ
-//                    y = (int) event.getRawY() - (offsetY + statusBarHeight) - mHeight / 2;
-//                    setX(x);
-//                    setY(y);
-//                }
-//                break;
-//        }
-////        if (!switchState/* == false*/) return false;
+
         return true;
         /*
         11/29 falseにすると TouchACTION_DOWN => onLongClick
             tureにすると TouchACTION_DOWN => (TouchACTION_MOVE =>) onLongClick => (TouchACTION_MOVE =>) TouchACTION_UP => onClick
          */
     }
-
-//    @Override
-//    public boolean performClick() {
-//        super.performClick();
-//        return true;
-//    }
-
-//    @Override
-//    public void onClick(View v) {
-//
-//    }
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-//        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-//        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-//        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-//        setMeasuredDimension(widthSize, heightSize);
-
-//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-//
         setMeasuredDimension(mWidth, mHeight);
     }
 
@@ -179,5 +138,17 @@ public class BadgeView extends Button /*implements View.OnClickListener*/ {
 
     public void setSwitchisCheched(boolean state) {
         this.switchState = state;
+    }
+
+    public void setTextData(String textData) {
+        this.mTextData = textData;
+    }
+
+    public String getTextData() {
+        return this.mTextData;
+    }
+
+    public void callDialogFragment(int viewId, String mTextData) {
+
     }
 }

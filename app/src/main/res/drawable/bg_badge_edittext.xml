@@ -7,6 +7,6 @@
     <gradient
         android:angle="90"
         android:endColor="@color/colorScheme_BrightPastel_Blue_0"
-        android:startColor="@color/colorScheme_BrightPastel_Blue_1" />
+        android:startColor="@color/colorScheme_BrightPastel_Blue_0" />
 
 </shape>

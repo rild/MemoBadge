@@ -5,12 +5,12 @@
 
     <stroke
         android:width="2dp"
-        android:color="@color/colorScheme_BrightPastel_Blue_4" />
+        android:color="@color/colorScheme_BrightPastel_Yellow_2" />
 
 
     <gradient
         android:angle="90"
-        android:endColor="@color/colorScheme_BrightPastel_Blue_1"
-        android:startColor="@color/colorScheme_BrightPastel_Blue_1"
+        android:endColor="@color/colorScheme_BrightPastel_Yellow_0"
+        android:startColor="@color/colorScheme_BrightPastel_Yellow_0"
         />
 </shape>
